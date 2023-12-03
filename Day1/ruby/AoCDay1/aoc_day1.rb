@@ -1,28 +1,92 @@
 require 'minitest/autorun'
 
-Sample_input = %Q(
+Sample_input_day1 = %Q(
 1abc2
 pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet
 ).split
 
-Sample_results = %Q(
+Sample_results_day1 = %Q(
 12
 38
 15
 77
 ).split
 
-Sample_sum = 142
+Sample_input_day1_p2 = %Q(
+two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen
+).split
 
-def parse_from_left(input_line)
-  pos = input_line =~/[0-9]/;
-  pos == nil ? 0 : input_line[pos].to_i ;
+Sample_results_day1_p2 = %Q(
+29
+83
+13
+24
+42
+14
+76
+).split
+
+Sample_sum_d1p1 = 142
+
+Sample_sum_d1p2 = 281
+
+
+Desired_substitutions = [
+  ["zero", "0" ],
+  ["one", "1" ],
+  ["two", "2" ],
+  ["three", "3" ],
+  ["four", "4" ],
+  ["five", "5" ],
+  ["six", "6" ],
+  ["seven", "7" ],
+  ["eight", "8" ],
+  ["nine", "9" ] ]
+
+Desired_substitutions_reversed = [
+  ["zero".reverse, "0" ],
+  ["one".reverse, "1" ],
+  ["two".reverse, "2" ],
+  ["three".reverse, "3" ],
+  ["four".reverse, "4" ],
+  ["five".reverse, "5" ],
+  ["six".reverse, "6" ],
+  ["seven".reverse, "7" ],
+  ["eight".reverse, "8" ],
+  ["nine".reverse, "9" ] ]
+
+def parse_from_left( input_line)
+  parse_from_left_withArray( input_line, Desired_substitutions)
+end
+
+def parse_from_left_withArray(input_line, digitArray)
+  pos = input_line.length
+  result = 0
+  digitArray.each do |digit|
+    digit_as_text_pos = input_line.index(digit[0])
+    digit_as_digit_pos = input_line.index(digit[1])
+    if digit_as_text_pos && (digit_as_text_pos < pos)
+      pos = digit_as_text_pos
+      result = digit[1].to_i
+    end
+    if digit_as_digit_pos && (digit_as_digit_pos < pos)
+      pos = digit_as_digit_pos
+      result = digit[1].to_i
+    end
+  end
+  result
 end
 
 def parse_from_right(input_line)
-  parse_from_left(input_line.reverse)
+  parse_from_left_withArray(input_line.reverse, Desired_substitutions_reversed)
 end
 
 class FindingTheDigits < Minitest::Test
@@ -57,8 +121,8 @@ class CalculatingTheLines < Minitest::Test
   end
 
   def test_set_from_AoC
-    Sample_input.each.with_index do | element, i |
-      assert_equal( Sample_results[i].to_i, evaluate_line(element), Sample_results[i])
+    Sample_input_day1.each.with_index do | element, i |
+      assert_equal(Sample_results_day1[i].to_i, evaluate_line(element), Sample_results_day1[i])
     end
   end
 end
@@ -66,10 +130,31 @@ end
 def sum_up_lines( all_the_lines )
   all_the_lines.sum { |item| evaluate_line(item) }
 end
+
 class CalculateTotal < Minitest::Test
   def test_from_array
-    assert_equal( Sample_sum, sum_up_lines( Sample_input ), Sample_sum.to_s )
+    assert_equal(Sample_sum_d1p1, sum_up_lines(Sample_input_day1 ), Sample_sum_d1p1.to_s )
   end
+end
+
+=begin
+the_lines = File.readlines("the_data.txt")
+final_number = sum_up_lines( the_lines )
+puts "Final result: #{final_number}"
+=end
+
+class SubstituteWrittenNumbers < Minitest::Test
+
+  def test_set2_from_AoC
+    Sample_input_day1_p2.each.with_index do | element, i |
+      assert_equal(Sample_results_day1_p2[i].to_i, evaluate_line(element), Sample_results_day1_p2[i])
+    end
+  end
+
+  def test_set_from_aoc_d1_with_total
+    assert_equal( Sample_sum_d1p2, sum_up_lines(Sample_input_day1_p2), "Sample should yiels this number")
+  end
+
 end
 
 the_lines = File.readlines("the_data.txt")
