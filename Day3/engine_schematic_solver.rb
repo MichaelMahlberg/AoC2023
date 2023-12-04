@@ -22,16 +22,46 @@ class EngineSchematicSolver
   end
 
   def getGrandTotal( engine_schematics_as_lines )
-
-    last_line = setup_last_line()
+    puts "finding out the grand total"
+    current_line=""
+    next_line=""
+    line_number = 0
+    processor_is_warm = false
     engine_schematics_as_lines.each_line do |line_to_process|
-      if processor_is_warm.nil?
+      if not processor_is_warm
         processor_is_warm = true
-        next_line = line_to_process
+        current_line = setup_last_line()
+        next_line = line_to_process.strip
         next
       end
-    end
 
+      line_number += 1
+      last_line = current_line
+      current_line = next_line
+      next_line = line_to_process.strip
+
+      puts "line_number: #{line_number}\n" +
+             "window: ---\n" +
+             "- «#{last_line}»\n" +
+             "> «#{current_line}»\n" +
+             "+ «#{next_line}»\n" +
+             "-----"
+
+    end
+    line_number += 1
+    last_line = current_line
+    current_line = next_line
+    next_line = ""
+
+    puts "line_number: #{line_number}\n" +
+           "window: ---\n" +
+           "- «#{last_line}»\n" +
+           "> «#{current_line}»\n" +
+           "+ «#{next_line}»\n" +
+           "-----"
+
+
+=begin
     current_line= engine_schematics_as_lines.
     numbers_in_line = findNumbersInLine( engine_schematics_as_lines )
     numbers_in_line.each { |potential_part_number|
@@ -43,5 +73,6 @@ class EngineSchematicSolver
     last_line
     current_line
     next_line
+=end
   end
 end
