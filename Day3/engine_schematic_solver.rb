@@ -21,44 +21,45 @@ class EngineSchematicSolver
     ""
   end
 
-  def getGrandTotal( engine_schematics_as_lines )
-    puts "finding out the grand total"
+  def move_window_over( all_the_lines )
     current_line=""
     next_line=""
-    line_number = 0
     processor_is_warm = false
-    engine_schematics_as_lines.each_line do |line_to_process|
+    all_the_lines.each_line do |line_to_process|
       if not processor_is_warm
         processor_is_warm = true
-        current_line = setup_last_line()
+        current_line = ""
         next_line = line_to_process.strip
         next
       end
 
-      line_number += 1
       last_line = current_line
       current_line = next_line
       next_line = line_to_process.strip
 
+      yield last_line, current_line, next_line
+
+    end
+    last_line = current_line
+    current_line = next_line
+    next_line = ""
+    yield last_line, current_line, next_line
+
+  end
+
+  def getGrandTotal( engine_schematics_as_lines )
+    line_number=0
+    move_window_over( engine_schematics_as_lines ) do |last_line, current_line, next_line|
+      line_number += 1
       puts "line_number: #{line_number}\n" +
              "window: ---\n" +
              "- «#{last_line}»\n" +
              "> «#{current_line}»\n" +
              "+ «#{next_line}»\n" +
              "-----"
-
     end
-    line_number += 1
-    last_line = current_line
-    current_line = next_line
-    next_line = ""
+    puts "finding out the grand total"
 
-    puts "line_number: #{line_number}\n" +
-           "window: ---\n" +
-           "- «#{last_line}»\n" +
-           "> «#{current_line}»\n" +
-           "+ «#{next_line}»\n" +
-           "-----"
 
 
 =begin

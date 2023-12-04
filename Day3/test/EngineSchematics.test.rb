@@ -6,8 +6,14 @@ class WalkingThroughTheLines < Minitest::Test
     @myLines = "....123....\n....234....\n....345....\n"
   end
 
-  def test_first_line_gets_skipped
+  def test_moving_window
     solver = EngineSchematicSolver.new
-    solver.getGrandTotal(@myLines)
+    actual_windows = []
+    solver.move_window_over(@myLines) do |a,b,c|
+      actual_windows << [a,b,c]
+    end
+    assert_equal( [["","....123....","....234...."],
+                   ["....123....","....234....","....345...."],
+                   ["....234....","....345....",""]], actual_windows )
   end
 end
