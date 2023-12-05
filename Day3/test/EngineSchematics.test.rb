@@ -36,10 +36,11 @@ class WalkingThroughTheLines < Minitest::Test
 
 end
 
-class FindinSymbols < Minitest::Test
+class FindingSymbols < Minitest::Test
   def setup
     @solver = EngineSchematicSolver.new
   end
+  # Explanations
   # 0123456789012345
   # ....123.... => s=5, l=3
   # It should_not_find
@@ -67,8 +68,8 @@ class FindinSymbols < Minitest::Test
     "...x.......",
     "....x......",
     ".....x.....",
-    "..---.x....",
-    "..---..x..."].each do |data|
+    "......x....",
+    ".......x..."].each do |data|
     define_method("test_it_should_find_#{data}") do
       assert_equal(true, @solver.is_there_an_adjacent_symbol(data, 4, 3) )
     end

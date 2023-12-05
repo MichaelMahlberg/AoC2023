@@ -88,7 +88,7 @@ class EngineSchematicSolver
   end
 
   def is_there_an_adjacent_symbol(entry, start, length)
-    partial = entry[start-1,length+1]
+    partial = entry[start-1,length+2]
     !(/[^0-9\.]/ =~ partial).nil?
   end
 end
