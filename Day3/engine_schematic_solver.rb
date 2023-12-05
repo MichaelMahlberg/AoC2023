@@ -117,5 +117,8 @@ class EngineSchematicSolver
     end
   end
 
+  def machine_parts_power(the_lines)
+    collect_machine_parts(the_lines).inject(:*)
+  end
 
 end
