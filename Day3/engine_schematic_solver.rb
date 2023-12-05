@@ -6,7 +6,7 @@ class Possible_engine_part_number
   attr_accessor :length
 
   def initialize( value, start, length )
-    @value=value
+    @value=value.to_i
     @start=start
     @length=length
   end
@@ -90,5 +90,23 @@ class EngineSchematicSolver
   def is_there_an_adjacent_symbol(entry, start, length)
     partial = entry[start-1,length+2]
     !(/[^0-9\.]/ =~ partial).nil?
+  end
+
+  def find_machine_parts_in_frame(previous_line,
+                                  current_line,
+                                  upcoming_line)
+    found_items = []
+    findNumbersInLine(current_line).each do |number|
+      [previous_line, current_line,upcoming_line].each do |line|
+        if is_there_an_adjacent_symbol(
+          line, number.start, number.length
+        )
+          found_items << number.value
+          break;
+        end
+
+      end
+    end
+    found_items
   end
 end

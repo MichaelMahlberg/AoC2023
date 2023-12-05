@@ -74,4 +74,74 @@ class FindingSymbols < Minitest::Test
       assert_equal(true, @solver.is_there_an_adjacent_symbol(data, 4, 3) )
     end
   end
+
+  def test_identify_machine_part_in_one_frame
+
+    frame = [
+      "..........",
+      "...123....",
+      ".........."]
+
+    assert_equal( [],
+                  @solver.find_machine_parts_in_frame(
+                    frame[0],
+                    frame[1],
+                    frame[2])
+    )
+  end
+
+  def test_identify_machine_part_in_one_frame_with_symbol
+
+    frame = [
+      "..........",
+      "...123x...",
+      ".........."]
+
+    assert_equal( 123,
+                  @solver.find_machine_parts_in_frame(
+                    frame[0],
+                    frame[1],
+                    frame[2])[0]
+    )
+  end
+
+  {
+    :outside =>
+      ["...x...............",
+       "......123..........",
+       "...................", []],
+    "top_left" =>
+      ["....x.............",
+       ".....123..........",
+       "..................", [123]],
+    "bottom_right_hash" =>
+      ["..................",
+       ".....123..........",
+       "........#.........", [123]],
+    "two_numberst" =>
+      ["....x.............",
+       ".....123..456.....",
+       ".........$........", [123, 456]],
+    "two_numberst_one_symbol" =>
+      ["..........23......",
+       ".....123.456......",
+       "........$.........", [123, 456]],
+    "two_numberst_no_symbol" =>
+      ["..................",
+       ".........23.......",
+       ".....123.456......", []]
+
+
+  }.each do |entry|
+    define_method("test_find_#{entry[0]}") do
+      assert_equal( entry[1][3],
+                    @solver.find_machine_parts_in_frame(
+                      entry[1][0],
+                      entry[1][1],
+                      entry[1][2]
+                    ) );
+    end
+  end
+
+
 end
