@@ -33,4 +33,44 @@ class WalkingThroughTheLines < Minitest::Test
       "....124....24..").map {|x| x.to_s}
     assert_equal( expected, actual )
   end
+
+end
+
+class FindinSymbols < Minitest::Test
+  def setup
+    @solver = EngineSchematicSolver.new
+  end
+  # 0123456789012345
+  # ....123.... => s=5, l=3
+  # It should_not_find
+  # ..x........
+  # .........x.
+  # ...........
+  # It shoudl_find
+  # ...x.......
+  # ....x......
+  # .....x.....
+  # ..---.x....
+  # ..---..x...
+  # @solver.is_adjacent_symbol(
+
+  [
+    "..x........",
+    ".........x."
+  ].each do |entry|
+    define_method("test_it_should_not_find_#{entry}") do
+      assert_equal(false, @solver.is_there_an_adjacent_symbol(entry, 4, 3) )
+    end
+  end
+
+  [
+    "...x.......",
+    "....x......",
+    ".....x.....",
+    "..---.x....",
+    "..---..x..."].each do |data|
+    define_method("test_it_should_find_#{data}") do
+      assert_equal(true, @solver.is_there_an_adjacent_symbol(data, 4, 3) )
+    end
+  end
 end

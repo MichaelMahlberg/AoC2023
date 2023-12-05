@@ -62,15 +62,16 @@ class EngineSchematicSolver
 
   def getGrandTotal( engine_schematics_as_lines )
     line_number=0
-    move_window_over( engine_schematics_as_lines ) do |last_line, current_line, next_line|
+    move_window_over( engine_schematics_as_lines ) do |last, current, following|
       line_number += 1
-      numbers = findNumbersInLine(current_line)
+      numbers = findNumbersInLine(current)
+
 
       puts "line_number: #{line_number}\n" +
              "window: ---\n" +
-             "- «#{last_line}»\n" +
-             "> «#{current_line}»\n" +
-             "+ «#{next_line}»\n" +
+             "- «#{last}»\n" +
+             "> «#{current}»\n" +
+             "+ «#{following}»\n" +
              "-----"
     end
 
@@ -84,5 +85,10 @@ class EngineSchematicSolver
       look_for_adjacent_symbol_in_next_line( potential_part_number.start, potential_part_number.length )
     }
 =end
+  end
+
+  def is_there_an_adjacent_symbol(entry, start, length)
+    partial = entry[start-1,length+1]
+    !(/[^0-9\.]/ =~ partial).nil?
   end
 end
