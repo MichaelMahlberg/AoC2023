@@ -87,7 +87,7 @@ class EngineSchematicSolver
 =end
   end
 
-  def is_there_an_adjacent_symbol(entry, start, length)
+  def adjacent_symbol?(entry, start, length)
     partial = entry[start-1,length+2]
     !(/[^0-9\.]/ =~ partial).nil?
   end
@@ -98,7 +98,7 @@ class EngineSchematicSolver
     found_items = []
     findNumbersInLine(current_line).each do |number|
       [previous_line, current_line,upcoming_line].each do |line|
-        if is_there_an_adjacent_symbol(
+        if adjacent_symbol?(
           line, number.start, number.length
         )
           found_items << number.value
@@ -109,4 +109,13 @@ class EngineSchematicSolver
     end
     found_items
   end
+
+  def collect_machine_parts(the_lines)
+    values=[]
+    move_window_over(the_lines) do |prev, curr, nxt|
+      values += find_machine_parts_in_frame(prev, curr, nxt)
+    end
+  end
+
+
 end
