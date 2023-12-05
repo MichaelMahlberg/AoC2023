@@ -88,7 +88,8 @@ class EngineSchematicSolver
   end
 
   def adjacent_symbol?(entry, start, length)
-    partial = entry[start-1,length+2]
+    start_margin= start == 0 ? 0 : 1
+    partial = entry[start-start_margin,length+1+start_margin]
     !(/[^0-9\.]/ =~ partial).nil?
   end
 
@@ -113,12 +114,18 @@ class EngineSchematicSolver
   def collect_machine_parts(the_lines)
     values=[]
     move_window_over(the_lines) do |prev, curr, nxt|
-      values += find_machine_parts_in_frame(prev, curr, nxt)
+      intermediate = find_machine_parts_in_frame(prev, curr, nxt)
+      puts "Intermediate = «#{intermediate}»" unless $test_mode == true
+      values += intermediate
     end
   end
 
-  def machine_parts_power(the_lines)
-    collect_machine_parts(the_lines).inject(:*)
+  def machine_parts_sum(the_lines)
+    collect_machine_parts(the_lines).inject(:+)
   end
 
 end
+
+solver = EngineSchematicSolver.new
+lines = File.open("SampleEngineSchematics.txt")
+puts "\n"+solver.machine_parts_sum(lines).to_s+"\n"

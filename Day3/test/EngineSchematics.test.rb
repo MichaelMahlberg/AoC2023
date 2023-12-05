@@ -1,6 +1,8 @@
 require 'minitest/autorun'
 require_relative '../engine_schematic_solver.rb'
 
+$test_mode = true
+
 class WalkingThroughTheLines < Minitest::Test
   def setup
     @myLines = "....123....\n....234....\n....345....\n"
@@ -24,6 +26,12 @@ class WalkingThroughTheLines < Minitest::Test
     assert_equal(expected, actual)
   end
 
+  def test_find_one_number_at_start_of_line
+    expected = Possible_engine_part_number.new(124, 0, 3).to_s
+    actual = @solver.findNumbersInLine(
+      "124........")[0].to_s
+    assert_equal(expected, actual)
+  end
   def test_find_two_numbers_in_line
     expected = [
       Possible_engine_part_number.new(124, 4, 3).to_s,
@@ -132,6 +140,7 @@ class FindingSymbols < Minitest::Test
       ["..................",
        ".........23.......",
        ".....123.456......", []]
+
   }.each do |entry|
     define_method("test_find_#{entry[0]}") do
       assert_equal(entry[1][3],
@@ -144,9 +153,12 @@ class FindingSymbols < Minitest::Test
   end
 
   {
-    "2x3x4" => [".........x........\n" +
-                "........x2x.......\n" +
-                ".....#3..4........", [2,3,4]],
+    "617" => ["617*......\n" +
+                "..........\n" +
+                "............", [617]],
+    "2x3x4" => ["1x.......x........\n" +
+                "1x......x2x.......\n" +
+                ".....#3..4........", [1,1,2,3,4]],
     # 125*2130*12*21
     "125*2130*12*21" => ["..125.............\n" +
                          "...^.....2130§....\n" +
@@ -158,22 +170,32 @@ class FindingSymbols < Minitest::Test
   end
 
   [
-    ["2x3x4",
+    ["2+3+4",
      "..................\n" +
      ".........2x.......\n" +
      ".....#3..4........",
-    24],
+     9],
     # 125*2130*12*21
-    ["125*2130*12*21",
+    ["125+2130+12+21",
      "..125.............\n" +
      "...^.....2130§....\n" +
      "..12...21x.......",
-     67095000]
+     2288]
   ].each do |name, lines, result|
-    define_method("test_power_#{name}") do
-      assert_equal( result, @solver.machine_parts_power(lines))
+    define_method("test_sum_#{name}") do
+      assert_equal( result, @solver.machine_parts_sum(lines))
     end
 
+  end
+
+end
+
+
+class AoC_SampleData < Minitest::Test
+  def test_the_sample_data
+    solver = EngineSchematicSolver.new
+    lines = File.open("SampleEngineSchematics.txt")
+    assert_equal( 4361, solver.machine_parts_sum(lines) )
   end
 
 end
