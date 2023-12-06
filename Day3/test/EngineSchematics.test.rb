@@ -20,22 +20,23 @@ class WalkingThroughTheLines < Minitest::Test
   end
 
   def test_find_one_number_in_line
-    expected = Possible_engine_part_number.new(124, 4, 3).to_s
+    expected = PossibleEnginePartNumber.new(124, 4, 3).to_s
     actual = @solver.findNumbersInLine(
       "....124....")[0].to_s
     assert_equal(expected, actual)
   end
 
   def test_find_one_number_at_start_of_line
-    expected = Possible_engine_part_number.new(124, 0, 3).to_s
+    expected = PossibleEnginePartNumber.new(124, 0, 3).to_s
     actual = @solver.findNumbersInLine(
       "124........")[0].to_s
     assert_equal(expected, actual)
   end
+
   def test_find_two_numbers_in_line
     expected = [
-      Possible_engine_part_number.new(124, 4, 3).to_s,
-      Possible_engine_part_number.new(24, 11, 2).to_s
+      PossibleEnginePartNumber.new(124, 4, 3).to_s,
+      PossibleEnginePartNumber.new(24, 11, 2).to_s
     ]
     actual = @solver.findNumbersInLine(
       #                      01234567890123456789
@@ -156,16 +157,16 @@ class FindingSymbols < Minitest::Test
     "617" => ["617*......\n" +
                 "..........\n" +
                 "............", [617]],
-    "617_am_ende" => ["617*......\n" +
-                      "........x.\n" +
-                      ".........617", [618,617]],
+    "617_am_ende" => ["618*......\n" +
+                        "........x.\n" +
+                        ".........617", [618, 617]],
     "2x3x4" => ["1x.......x........\n" +
-                "1x......x2x.......\n" +
-                ".....#3..4........", [1,1,2,3,4]],
+                  "1x......x2x.......\n" +
+                  ".....#3..4........", [1, 1, 2, 3, 4]],
     # 125*2130*12*21
     "125*2130*12*21" => ["..125.............\n" +
-                         "...^.....2130§....\n" +
-                         "..12...21x.......", [125,2130,12,21]]
+                           "...^.....2130§....\n" +
+                           "..12...21x.......", [125, 2130, 12, 21]]
   }.each do |key, parms|
     define_method("test_all_parts_#{key}") do
       assert_equal(parms[1], @solver.collect_machine_parts(parms[0]))
@@ -175,30 +176,95 @@ class FindingSymbols < Minitest::Test
   [
     ["2+3+4",
      "..................\n" +
-     ".........2x.......\n" +
-     ".....#3..4........",
+       ".........2x.......\n" +
+       ".....#3..4........",
      9],
     # 125*2130*12*21
     ["125+2130+12+21",
      "..125.............\n" +
-     "...^.....2130§....\n" +
-     "..12...21x.......",
+       "...^.....2130§....\n" +
+       "..12...21x.......",
      2288]
   ].each do |name, lines, result|
     define_method("test_sum_#{name}") do
-      assert_equal( result, @solver.machine_parts_sum(lines))
+      assert_equal(result, @solver.machine_parts_sum(lines))
     end
 
   end
 
 end
 
-
 class AoC_SampleData < Minitest::Test
   def test_the_sample_data
     solver = EngineSchematicSolver.new
     lines = File.open("SampleEngineSchematics.txt")
-    assert_equal( 4361, solver.machine_parts_sum(lines) )
+    assert_equal(4361, solver.machine_parts_sum(lines))
+  end
+
+end
+
+class FindSceeceqsdxtars < Minitest::Test
+  def setup
+    @solver = EngineSchematicSolver.new
+  end
+
+  def test_finding_stars
+    assert_equal(7, @solver.find_stars_in_line(".......*..")[0].x)
+    assert_equal(2, @solver.find_stars_in_line("..*....*..")[0].x)
+    assert_equal(7, @solver.find_stars_in_line("..*....*..")[1].x)
+    assert_equal([2, 5, 9], @solver.find_stars_in_line("..*1.*.78*..").map { |s| s.x })
+  end
+
+  def test_check_for_adjacent_number_left
+    a_potential_gear = Potential_gear.new(5)
+    #        "012345678"
+    a_line = "...12...."
+    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+  end
+
+  def test_check_for_adjacent_number_right
+    a_potential_gear = Potential_gear.new(5)
+    #        "012345678"
+    a_line = "......12."
+    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+    a_line = "........12"
+    assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
+  end
+
+  def test_check_for_adjacent_number_between
+    a_potential_gear = Potential_gear.new(5)
+    #        "012345678"
+    a_line = "....1212."
+    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+    a_line = "..1......."
+    assert_equal(0,@solver.number_adjacent?(a_potential_gear, a_line))
+  end
+
+  def test_check_for_adjacent_number_edges
+    a_potential_gear = Potential_gear.new(5)
+    #        "012345678"
+    a_line = "....12"
+    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+
+    a_line = "..1......."
+    assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
+
+    a_potential_gear = Potential_gear.new(1)
+    ["1.....", ".1...."].each do |a_line|
+      assert(@solver.number_adjacent?(a_potential_gear, a_line))
+    end
+  end
+
+  def test_check_for_adjacent_number_both_sides
+    a_potential_gear = Potential_gear.new(5)
+    #        "012345678"
+    a_line = "12.....12"
+    assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
+
+    [ "..123.456.",
+      "....1.1..."].each do |a_line|
+      assert_equal(2, @solver.number_adjacent?(a_potential_gear, a_line))
+    end
   end
 
 end

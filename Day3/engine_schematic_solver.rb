@@ -1,6 +1,5 @@
-# frozen_string_literal: true
 
-class Possible_engine_part_number
+class PossibleEnginePartNumber
   attr_accessor :value
   attr_accessor :start
   attr_accessor :length
@@ -16,18 +15,32 @@ class Possible_engine_part_number
   end
 end
 
+class Potential_gear
+
+  attr_reader :x
+  def initialize( position )
+    @x = position
+  end
+end
+
+# frozen_string_literal: true
 class EngineSchematicSolver
   def findNumbersInLine(engine_schematics_as_line)
     engine_schematics_as_line.enum_for(:scan, /[0-9]+/)
-      .map do
-      Possible_engine_part_number.new(
-            $~.to_s,
-            $~.begin(0),
-            $~.end(0)-$~.begin(0)
-                   )
+                             .map do
+      PossibleEnginePartNumber.new(
+        $~.to_s,
+        $~.begin(0),
+        $~.end(0)-$~.begin(0)
+      )
     end
   end
 
+  def find_stars_in_line(the_line)
+    the_line.enum_for(:scan, /\*/).map do
+      Potential_gear.new($~.begin(0) )
+    end
+  end
   def setup_last_line
     ""
   end
@@ -60,37 +73,17 @@ class EngineSchematicSolver
 
   end
 
-  def getGrandTotal( engine_schematics_as_lines )
-    line_number=0
-    move_window_over( engine_schematics_as_lines ) do |last, current, following|
-      line_number += 1
-      numbers = findNumbersInLine(current)
-
-
-      puts "line_number: #{line_number}\n" +
-             "window: ---\n" +
-             "- «#{last}»\n" +
-             "> «#{current}»\n" +
-             "+ «#{following}»\n" +
-             "-----"
-    end
-
-
-
-
-=begin
-    numbers_in_line.each { |potential_part_number|
-      look_for_adjacent_symbol_in_previous_line( potential_part_number.start, potential_part_number.length )
-      look_for_adjacent_symbol_in_current_line( potential_part_number.start, potential_part_number.length )
-      look_for_adjacent_symbol_in_next_line( potential_part_number.start, potential_part_number.length )
-    }
-=end
+  def contains_symbol(partial)
+    !(/[^0-9\.]/ =~ partial).nil?
   end
 
   def adjacent_symbol?(entry, start, length)
     start_margin= start == 0 ? 0 : 1
-    partial = entry[start-start_margin,length+1+start_margin]
-    !(/[^0-9\.]/ =~ partial).nil?
+    end_margin = (start + length) >= entry.length ? 0 : 1
+
+    partial = entry[start-start_margin,
+                    length+end_margin+start_margin]
+    contains_symbol(partial)
   end
 
   def find_machine_parts_in_frame(previous_line,
@@ -115,7 +108,7 @@ class EngineSchematicSolver
     values=[]
     move_window_over(the_lines) do |prev, curr, nxt|
       intermediate = find_machine_parts_in_frame(prev, curr, nxt)
-      puts "Intermediate = «#{intermediate}»" unless $test_mode == true
+      # puts "Intermediate = «#{intermediate}»" unless $test_mode == true
       values += intermediate
     end
   end
@@ -124,8 +117,34 @@ class EngineSchematicSolver
     collect_machine_parts(the_lines).inject(:+)
   end
 
+  def number_adjacent?(the_potential_gear, the_line)
+    adjecent = 0
+    x = the_potential_gear.x
+    numbers = findNumbersInLine( the_line )
+    numbers.each do |number|
+      adjecent += 1 if gear_text_adjacent?(number, x)
+    end
+    return adjecent
+  end
+
+  private
+
+  def gear_text_adjacent?(number, x)
+    (x >= number.start - 1 &&
+      x <= number.start + number.length + 1)
+  end
+
 end
 
 solver = EngineSchematicSolver.new
 lines = File.open("SampleEngineSchematics.txt")
-puts "\n"+solver.machine_parts_sum(lines).to_s+"\n"
+puts "\nSample Data « "+solver.machine_parts_sum(lines).to_s+" »\n"
+lines.close
+lines = File.open("EngineSchematics.txt")
+puts "\nReal Data « "+solver.machine_parts_sum(lines).to_s+" »\n"
+lines.close
+
+
+
+
+
