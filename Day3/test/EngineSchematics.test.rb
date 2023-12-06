@@ -21,14 +21,14 @@ class WalkingThroughTheLines < Minitest::Test
 
   def test_find_one_number_in_line
     expected = PossibleEnginePartNumber.new(124, 4, 3).to_s
-    actual = @solver.findNumbersInLine(
+    actual = @solver.find_numbers_in_line(
       "....124....")[0].to_s
     assert_equal(expected, actual)
   end
 
   def test_find_one_number_at_start_of_line
     expected = PossibleEnginePartNumber.new(124, 0, 3).to_s
-    actual = @solver.findNumbersInLine(
+    actual = @solver.find_numbers_in_line(
       "124........")[0].to_s
     assert_equal(expected, actual)
   end
@@ -38,7 +38,7 @@ class WalkingThroughTheLines < Minitest::Test
       PossibleEnginePartNumber.new(124, 4, 3).to_s,
       PossibleEnginePartNumber.new(24, 11, 2).to_s
     ]
-    actual = @solver.findNumbersInLine(
+    actual = @solver.find_numbers_in_line(
       #                      01234567890123456789
       "....124....24..").map { |x| x.to_s }
     assert_equal(expected, actual)

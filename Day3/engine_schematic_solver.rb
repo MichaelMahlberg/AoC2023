@@ -25,7 +25,7 @@ end
 
 # frozen_string_literal: true
 class EngineSchematicSolver
-  def findNumbersInLine(engine_schematics_as_line)
+  def find_numbers_in_line(engine_schematics_as_line)
     engine_schematics_as_line.enum_for(:scan, /[0-9]+/)
                              .map do
       PossibleEnginePartNumber.new(
@@ -74,7 +74,7 @@ class EngineSchematicSolver
   end
 
   def contains_symbol(partial)
-    !(/[^0-9\.]/ =~ partial).nil?
+    !(/[^0-9.]/ =~ partial).nil?
   end
 
   def adjacent_symbol?(entry, start, length)
@@ -90,13 +90,13 @@ class EngineSchematicSolver
                                   current_line,
                                   upcoming_line)
     found_items = []
-    findNumbersInLine(current_line).each do |number|
+    find_numbers_in_line(current_line).each do |number|
       [previous_line, current_line,upcoming_line].each do |line|
         if adjacent_symbol?(
           line, number.start, number.length
         )
           found_items << number.value
-          break;
+          break
         end
 
       end
@@ -118,13 +118,13 @@ class EngineSchematicSolver
   end
 
   def number_adjacent?(the_potential_gear, the_line)
-    adjecent = 0
+    adjacent = 0
     x = the_potential_gear.x
-    numbers = findNumbersInLine( the_line )
+    numbers = find_numbers_in_line(the_line )
     numbers.each do |number|
-      adjecent += 1 if gear_text_adjacent?(number, x)
+      adjacent += 1 if gear_text_adjacent?(number, x)
     end
-    return adjecent
+    adjacent
   end
 
   private
