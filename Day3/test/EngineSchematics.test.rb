@@ -262,7 +262,7 @@ class FindStars < Minitest::Test
     assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
 
     [ "..123.456.",
-      "....1.1..."].each do |a_line|
+      "....1..1..."].each do |a_line|
       assert_equal(2, @solver.number_adjacent?(a_potential_gear, a_line))
     end
   end
