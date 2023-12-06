@@ -5,13 +5,13 @@ $test_mode = true
 
 class WalkingThroughTheLines < Minitest::Test
   def setup
-    @myLines = "....123....\n....234....\n....345....\n"
+    @my_lines = "....123....\n....234....\n....345....\n"
     @solver = EngineSchematicSolver.new
   end
 
   def test_moving_window
     actual_windows = []
-    @solver.move_window_over(@myLines) do |a, b, c|
+    @solver.move_window_over(@my_lines) do |a, b, c|
       actual_windows << [a, b, c]
     end
     assert_equal([["", "....123....", "....234...."],
@@ -58,7 +58,7 @@ class FindingSymbols < Minitest::Test
   # ..x........
   # .........x.
   # ...........
-  # It shoudl_find
+  # It should_find
   # ...x.......
   # ....x......
   # .....x.....
@@ -129,15 +129,15 @@ class FindingSymbols < Minitest::Test
       ["..................",
        ".....123..........",
        "........#.........", [123]],
-    :two_numberst =>
+    :two_numbers =>
       ["....x.............",
        ".....123..456.....",
        ".........$........", [123, 456]],
-    :two_numberst_one_symbol =>
+    :two_numbers_one_symbol =>
       ["..........23......",
        ".....123.456......",
        "........$.........", [123, 456]],
-    :two_numberst_no_symbol =>
+    :two_numbers_no_symbol =>
       ["..................",
        ".........23.......",
        ".....123.456......", []]
@@ -149,7 +149,7 @@ class FindingSymbols < Minitest::Test
                      entry[1][0],
                      entry[1][1],
                      entry[1][2]
-                   ));
+                   ))
     end
   end
 
@@ -157,7 +157,7 @@ class FindingSymbols < Minitest::Test
     "617" => ["617*......\n" +
                 "..........\n" +
                 "............", [617]],
-    "617_am_ende" => ["618*......\n" +
+    "617_at_the_end" => ["618*......\n" +
                         "........x.\n" +
                         ".........617", [618, 617]],
     "2x3x4" => ["1x.......x........\n" +
@@ -203,7 +203,7 @@ class AoC_SampleData < Minitest::Test
 
 end
 
-class FindSceeceqsdxtars < Minitest::Test
+class FindStars < Minitest::Test
   def setup
     @solver = EngineSchematicSolver.new
   end
