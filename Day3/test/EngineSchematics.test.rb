@@ -315,6 +315,11 @@ class FindStars < Minitest::Test
                                                 @frame_for_two[1],
                                                 @frame_for_two[2]))
 
+    assert_equal( [[227,884],[67,298]],
+                  @solver.gear_numbers_in_frame(@frame_for_two_in_line[0],
+                                                @frame_for_two_in_line[1],
+                                                @frame_for_two_in_line[2]))
+
   end
 
   def test_gear_number_two_stars_one_line

@@ -130,9 +130,12 @@ class EngineSchematicSolver
   def gear_numbers_in_frame(before, actual, after)
     all_gear_numbers = []
     find_stars_in_line(actual).each do |a_star|
-      all_gear_numbers += adjacent_number(a_star, before)
-      all_gear_numbers += adjacent_number(a_star, actual)
-      all_gear_numbers += adjacent_number(a_star, after)
+      star_gear_numbers = []
+      star_gear_numbers += adjacent_number(a_star, before)
+      star_gear_numbers += adjacent_number(a_star, actual)
+      star_gear_numbers += adjacent_number(a_star, after)
+
+      all_gear_numbers += star_gear_numbers
     end
     all_gear_numbers
   end
