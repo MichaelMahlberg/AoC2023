@@ -117,34 +117,69 @@ class EngineSchematicSolver
     collect_machine_parts(the_lines).inject(:+)
   end
 
-  def number_adjacent?(the_potential_gear, the_line)
-    adjacent = 0
+  def adjacent_number(the_potential_gear, the_line)
+    adjacent = []
     x = the_potential_gear.x
     numbers = find_numbers_in_line(the_line )
     numbers.each do |number|
-      adjacent += 1 if gear_text_adjacent?(number, x)
+      adjacent << number.value if gear_text_adjacent?(number, x)
     end
     adjacent
+  end
+
+  def gear_numbers_in_frame(before, actual, after)
+    all_gear_numbers = []
+    find_stars_in_line(actual).each do |a_star|
+      all_gear_numbers += adjacent_number(a_star, before)
+      all_gear_numbers += adjacent_number(a_star, actual)
+      all_gear_numbers += adjacent_number(a_star, after)
+    end
+    all_gear_numbers
+  end
+
+  def gear_power_for(before, current, upcoming)
+    gear_numbers = gear_numbers_in_frame( before,
+                                          current,
+                                          upcoming)
+    gear_numbers.size == 2 ? gear_numbers.reduce(:*) : 0
+  end
+
+  def all_gear_powers(the_lines)
+    the_powers = []
+    move_window_over(the_lines) do |before, current, after|
+      this_lines_gear_powers = gear_power_for(before, current, after)
+      if this_lines_gear_powers > 0
+        the_powers << this_lines_gear_powers
+      end
+    end
+    the_powers
+  end
+
+  def gear_powers_sum(the_lines)
+    all_gear_powers(the_lines).reduce( :+ )
   end
 
   private
 
   def gear_text_adjacent?(number, x)
-    (x >= number.start - 1 &&
-      x <= number.start + number.length + 1)
+    (
+      (x >= (number.start - 1)) &&
+      (x <= (number.start + number.length))
+      )
   end
 
 end
 
 solver = EngineSchematicSolver.new
 lines = File.open("SampleEngineSchematics.txt")
-puts "\nSample Data « "+solver.machine_parts_sum(lines).to_s+" »\n"
+puts "\nSample Data summed « "+solver.machine_parts_sum(lines).to_s+" »\n"
+lines.close
+lines = File.open("SampleEngineSchematics.txt")
+puts "\nSample Data Gear-Values summed « "+solver.gear_powers_sum(lines).to_s+" »\n"
 lines.close
 lines = File.open("EngineSchematics.txt")
-puts "\nReal Data « "+solver.machine_parts_sum(lines).to_s+" »\n"
+puts "\nReal Data summed« "+solver.machine_parts_sum(lines).to_s+" »\n"
 lines.close
-
-
-
-
-
+lines = File.open("EngineSchematics.txt")
+puts "\nReal Data Gear-Values summed « "+solver.gear_powers_sum(lines).to_s+" »\n"
+lines.close

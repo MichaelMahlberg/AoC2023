@@ -194,7 +194,7 @@ class FindingSymbols < Minitest::Test
 
 end
 
-class AoC_SampleData < Minitest::Test
+class AoC_SampleDataSummedUp < Minitest::Test
   def test_the_sample_data
     solver = EngineSchematicSolver.new
     lines = File.open("SampleEngineSchematics.txt")
@@ -206,6 +206,21 @@ end
 class FindStars < Minitest::Test
   def setup
     @solver = EngineSchematicSolver.new
+
+    @frame_for_zero = ["...1...23..",
+                       "...1.*.1...",
+                       ".543....121"]
+    @frame_for_six  = ["...1.23..",
+                       "...1*1...",
+                       ".543.121"]
+    @frame_for_two  = ["...1.23..",
+                       "...1.*.1...",
+                       ".543.121"]
+    @frame_for_two_in_line = [
+      "...*............569#..496........888.............227......*..67......*..................877........*...#.......*.......716......975....@....",
+      "...730........................$...#..112............*..509..*.......858..710.......@567..%..610..821...918..................................",
+      ".........794.....701@..456-...505.....*............884.....298...............................&...............742=.....95...................."]
+
   end
 
   def test_finding_stars
@@ -219,39 +234,41 @@ class FindStars < Minitest::Test
     a_potential_gear = Potential_gear.new(5)
     #        "012345678"
     a_line = "...12...."
-    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([12], @solver.adjacent_number(a_potential_gear, a_line))
   end
 
   def test_check_for_adjacent_number_right
     a_potential_gear = Potential_gear.new(5)
-    #        "012345678"
+    #        "01234*678"
     a_line = "......12."
-    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
-    a_line = "........12"
-    assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([12], @solver.adjacent_number(a_potential_gear, a_line))
+    #        "01234*678"
+    a_line = ".......12"
+    assert_equal([], @solver.adjacent_number(a_potential_gear, a_line))
   end
 
   def test_check_for_adjacent_number_between
     a_potential_gear = Potential_gear.new(5)
-    #        "012345678"
+    #        "01234*678"
     a_line = "....1212."
-    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([1212], @solver.adjacent_number(a_potential_gear, a_line))
+    #        "01234*678"
     a_line = "..1......."
-    assert_equal(0,@solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([],@solver.adjacent_number(a_potential_gear, a_line))
   end
 
   def test_check_for_adjacent_number_edges
     a_potential_gear = Potential_gear.new(5)
     #        "012345678"
     a_line = "....12"
-    assert_equal(1, @solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([12], @solver.adjacent_number(a_potential_gear, a_line))
 
     a_line = "..1......."
-    assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([], @solver.adjacent_number(a_potential_gear, a_line))
 
     a_potential_gear = Potential_gear.new(1)
     ["1.....", ".1...."].each do |a_line|
-      assert(@solver.number_adjacent?(a_potential_gear, a_line),a_line)
+      assert(@solver.adjacent_number(a_potential_gear, a_line), a_line)
     end
   end
 
@@ -259,12 +276,72 @@ class FindStars < Minitest::Test
     a_potential_gear = Potential_gear.new(5)
     #        "012345678"
     a_line = "12.....12"
-    assert_equal(0, @solver.number_adjacent?(a_potential_gear, a_line))
+    assert_equal([], @solver.adjacent_number(a_potential_gear, a_line))
 
-    [ "..123.456.",
-      "....1.1..."].each do |a_line|
-      assert_equal(2, @solver.number_adjacent?(a_potential_gear, a_line), a_line)
+    [ ["..123.456.", [123,456]],
+      ["....7.9...", [7,9]] ].each do |a_line, a_result|
+      assert_equal(a_result, @solver.adjacent_number(a_potential_gear, a_line), a_line)
     end
   end
+
+  def test_check_with_little_distance
+    #"01234567890"
+    ["..11.*.....",
+     "...1.*.2..."].each { |a_line|
+      a_potential_gear = @solver.find_stars_in_line(a_line)[0]
+      assert_equal(5, a_potential_gear.x)
+      assert_equal([], @solver.adjacent_number(a_potential_gear,
+                                               a_line), a_line)
+    }
+  end
+
+
+  def test_collect_adjacent_in_frame_for_none
+      assert_equal( [] ,
+                     @solver.gear_numbers_in_frame(@frame_for_zero[0],
+                                                   @frame_for_zero[1],
+                                                   @frame_for_zero[2]))
+
+    end
+
+  def test_collect_adjacent_in_frame_for_many
+    assert_equal( [1,23,1,1,543,121] ,
+                  @solver.gear_numbers_in_frame(@frame_for_six[0],
+                                                @frame_for_six[1],
+                                                @frame_for_six[2]))
+
+    assert_equal( [23,121] ,
+                  @solver.gear_numbers_in_frame(@frame_for_two[0],
+                                                @frame_for_two[1],
+                                                @frame_for_two[2]))
+
+  end
+
+  def test_gear_number_two_stars_one_line
+
+  end
+
+
+  def test_power_for_gears
+    assert_equal(0,@solver.gear_power_for(@frame_for_zero[0],
+                                          @frame_for_zero[1],
+                                          @frame_for_zero[2]))
+    assert_equal(2783,@solver.gear_power_for(@frame_for_two[0],
+                                          @frame_for_two[1],
+                                          @frame_for_two[2]))
+    assert_equal(0,@solver.gear_power_for(@frame_for_six[0],
+                                          @frame_for_six[1],
+                                          @frame_for_six[2]))
+  end
+
+  def test_move_frame_for_gears
+    sample = File.readlines("SampleEngineSchematics.txt").join("\r")
+    assert_equal( [16345, 451490], @solver.all_gear_powers(sample))
+  end
+  def test_Calculate_sum
+    sample = File.readlines("SampleEngineSchematics.txt").join("\r")
+    assert_equal( 467835, @solver.gear_powers_sum(sample))
+  end
+
 
 end
