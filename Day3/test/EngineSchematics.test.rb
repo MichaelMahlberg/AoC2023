@@ -297,7 +297,7 @@ class FindStars < Minitest::Test
 
 
   def test_collect_adjacent_in_frame_for_none
-      assert_equal( [] ,
+      assert_equal( [[]] ,
                      @solver.gear_numbers_in_frame(@frame_for_zero[0],
                                                    @frame_for_zero[1],
                                                    @frame_for_zero[2]))
@@ -305,12 +305,12 @@ class FindStars < Minitest::Test
     end
 
   def test_collect_adjacent_in_frame_for_many
-    assert_equal( [1,23,1,1,543,121] ,
+    assert_equal( [[1,23,1,1,543,121]] ,
                   @solver.gear_numbers_in_frame(@frame_for_six[0],
                                                 @frame_for_six[1],
                                                 @frame_for_six[2]))
 
-    assert_equal( [23,121] ,
+    assert_equal( [[23,121]] ,
                   @solver.gear_numbers_in_frame(@frame_for_two[0],
                                                 @frame_for_two[1],
                                                 @frame_for_two[2]))

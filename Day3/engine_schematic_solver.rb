@@ -135,16 +135,20 @@ class EngineSchematicSolver
       star_gear_numbers += adjacent_number(a_star, actual)
       star_gear_numbers += adjacent_number(a_star, after)
 
-      all_gear_numbers += star_gear_numbers
+      all_gear_numbers << star_gear_numbers
     end
     all_gear_numbers
   end
 
   def gear_power_for(before, current, upcoming)
+    power = 0
     gear_numbers = gear_numbers_in_frame( before,
                                           current,
                                           upcoming)
-    gear_numbers.size == 2 ? gear_numbers.reduce(:*) : 0
+    gear_numbers.each do |star_numbers|
+      power += star_numbers.size == 2 ? star_numbers.reduce(:*) : 0
+    end
+    power
   end
 
   def all_gear_powers(the_lines)
